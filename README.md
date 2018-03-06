@@ -16,7 +16,13 @@ conda install -c conda-forge gdal
 
 conda install -c conda-forge/label/broken gdal
 
-STEP 3: 
+STEP 3: OPEN PYTHON FILE (.py) ON SPYDER OF ANACONDA
+
+STEP 4: RUN THE SCRIPT
+
+Hit Run File (F5)
+
+STEP 5: 
 
 
 Reference
