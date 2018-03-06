@@ -2,6 +2,15 @@
 A small script supporting GIS and RS technicians in converting between Vietnamese national coordinate system (VN2000) and WGS84 back and forth. I adopted the codes in Python GDAL/OGR Cookbook and inherited codes by Br. Elias Max König. Links to these sources are listed in reference.
 The transformation applies Molodensky Badekas method with 7 transformation parameters. These parameters were adopted from the report by Luyen et al. (2014).
 
+INSTRUCTION
+STEP 1: DOWNLOAD AND INSTALL ANACONDA
+Link: https://www.anaconda.com/download/
+STEP 2: INSTALL OSGEO LIBRARIES
+Open Anaconda terminal (Prompt) and paste:
+conda install -c conda-forge gdal 
+conda install -c conda-forge/label/broken gdal
+STEP 3: 
+
 
 Reference
 
