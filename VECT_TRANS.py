@@ -22,14 +22,7 @@ def spatrefdef(layer):
     spatref = layer.GetSpatialRef()
     print('Spatial reference of your input vector is: {}'.format(spatref))
     return spatref
-def importfield(layer,outLayer):
-    inLayerDefn = layer.GetLayerDefn()
-    for i in range(0,inLayerDefn.GetFieldCount()):
-        fieldDefn = inLayerDefn.GetFieldDefn(i)
-        outLayer.CreateField(fieldDefn)
-        print(i)
-    outLayerDefn = outLayer.GetLayerDefn()
-    return outLayerDefn
+
 def newvect(layer):    
     newfulname = inshpdir.split('.')[-2] + '_Trans.shp'
     newname = inshpdir.split('.')[-2].split('\\')[-1]
@@ -37,9 +30,34 @@ def newvect(layer):
     outdataset = driver.CreateDataSource(newfulname)
     outlayer = outdataset.CreateLayer(newname+'_Trans',geom_type = ogr.wkbPolygon)    
     return outlayer
-def VN2K2WGS84(layer):
-        
-    prj = open('D:\\Tai_Lieu\\Tai_Lieu_Hoc\\GIS\\VN2K\\3405 (2).prj').read()
+def VN2K2WGS84(layer):        
+    #prj = open('D:\\Tai_Lieu\\Tai_Lieu_Hoc\\GIS\\VN2K\\3405 (2).prj').read()
+    centralmerid = input('PLEASE INPUT CENTRAL MERIDIAN OF INPUT FILE: ')
+    scale = input('PLEASE CHOOSE SCALE OF INPUT FILE (0.9996/0.9999): ') 
+    prj = '''PROJCS["VN-2000 / UTM zone 48N", 
+    GEOGCS["VN-2000",_
+        DATUM["Vietnam_2000",
+            SPHEROID["WGS 84",6378137,298.257223563,
+                AUTHORITY["EPSG","7030"]],
+            TOWGS84[-191.90441429,-39.30318279,-111.45032835,-0.00928836,0.01975479,-0.00427372,1.000000252906278],
+            AUTHORITY["EPSG","6756"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]],
+        AUTHORITY["EPSG","4756"]],
+    PROJECTION["Transverse_Mercator"],
+    PARAMETER["latitude_of_origin",0],
+    PARAMETER["central_meridian",{}],
+    PARAMETER["scale_factor",{}],
+    PARAMETER["false_easting",500000],
+    PARAMETER["false_northing",0],
+    UNIT["metre",1,
+        AUTHORITY["EPSG","9001"]],
+    AXIS["Easting",EAST],
+    AXIS["Northing",NORTH],
+    AUTHORITY["EPSG","3405"]]'''.format(centralmerid,scale)
+    
     vnspatref = osr.SpatialReference()
     vnspatref.ImportFromWkt(prj)
     wgsspatref = osr.SpatialReference()
@@ -76,14 +94,11 @@ def main_menu():
     os.system('clear')
     print('WELCOME TO COORDINATE TRANSFORMATION PROGRAM! \n')
     print('PLEASE CHOOSE OPERATION YOU WANT: \n')
-    print('1. TRANSFORM VN2000 TO GEOGRAPHIC WGS84')
-        
+    print('1. TRANSFORM VN2000 TO GEOGRAPHIC WGS84')        
     choice = input('>> ')
     exec_menu(choice)    
 ###################
-
-
-
+    
 #FUNCTION
 menu_actions = {}
 #FUNCTION EXECUTE MENU
