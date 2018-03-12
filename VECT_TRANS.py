@@ -315,6 +315,8 @@ menu_actions = {
         'main_menu': main_menu,
         '1': PRJVN2K2WGS84,
         '2': PRJVN20002UTM,
+        '3': GEOVN2K2WGS84,
+        '4': GEOVN2K2UTM,
         '9': back,
         '0': exit}
 ###############
