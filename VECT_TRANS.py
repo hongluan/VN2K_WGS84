@@ -158,14 +158,119 @@ def PRJVN20002UTM(layer):
     file.close()
     
 ###########################################
+
+#FUNCTION TRANSFORMING FROM GEOGRAPHIC VN2000 TO GEOGRAPHIC WGS84
+def GEOVN2K2WGS84(layer):    
+    prj = '''GEOGCS["VN-2000",
+    DATUM["Vietnam_2000",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        TOWGS84[-191.90441429,-39.30318279,-111.45032835,-0.00928836,0.01975479,-0.00427372,1.000000252906278],
+        AUTHORITY["EPSG","6756"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4756"]]'''    
+    vnspatref = osr.SpatialReference()
+    vnspatref.ImportFromWkt(prj)
+    wgsspatref = osr.SpatialReference()
+    wgsspatref.ImportFromEPSG(4326)
     
+    transform = osr.CoordinateTransformation(vnspatref,wgsspatref)
+    
+    newfulname = inshpdir.split('.')[-2] + '_GEOWGS.shp'
+    
+    newname = inshpdir.split('.')[-2].split('\\')[-1]
+    
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+    outdataset = driver.CreateDataSource(newfulname)
+    outLayer = outdataset.CreateLayer(newname+'_GEOWGS',geom_type = ogr.wkbPolygon)    
+    inLayerDefn = layer.GetLayerDefn()    
+    for i in range(0, inLayerDefn.GetFieldCount()):
+        fieldDefn = inLayerDefn.GetFieldDefn(i)
+        outLayer.CreateField(fieldDefn)
+    outLayerDefn = outLayer.GetLayerDefn()    
+    for feature in layer:    
+        geom = feature.GetGeometryRef()        
+        geom.Transform(transform)    
+        outFeature = ogr.Feature(outLayerDefn)    
+        outFeature.SetGeometry(geom)        
+        for i in range(0,outLayerDefn.GetFieldCount()):            
+            outFeature.SetField(outLayerDefn.GetFieldDefn(i).GetNameRef(), feature.GetField(i))    
+        outLayer.CreateFeature(outFeature)    
+        outFeature = None          
+    wgsspatref.MorphToESRI()
+    newfulnamenoext = newfulname.split('.')[-2]
+    file = open(newfulnamenoext+'.prj', 'w') 
+    file.write(wgsspatref.ExportToWkt())
+    file.close()        
+#################################################################
+
+#FUNCTION TRANSFORMING FROM GEOGRAPHIC VN2000 TO UTM
+def GEOVN2K2UTM(layer):
+    
+    UTMcent = input('PLEASE CHOOSE UTM ZONE (48/49): ')
+    prj = '''GEOGCS["VN-2000",
+    DATUM["Vietnam_2000",
+        SPHEROID["WGS 84",6378137,298.257223563,
+            AUTHORITY["EPSG","7030"]],
+        TOWGS84[-191.90441429,-39.30318279,-111.45032835,-0.00928836,0.01975479,-0.00427372,1.000000252906278],
+        AUTHORITY["EPSG","6756"]],
+    PRIMEM["Greenwich",0,
+        AUTHORITY["EPSG","8901"]],
+    UNIT["degree",0.0174532925199433,
+        AUTHORITY["EPSG","9122"]],
+    AUTHORITY["EPSG","4756"]]'''
+    
+    vnspatref = osr.SpatialReference()
+    vnspatref.ImportFromWkt(prj)
+    wgsspatref = osr.SpatialReference()
+    if int(UTMcent) == 48:
+        wgsspatref.ImportFromEPSG(32648)
+    else:
+        wgsspatref.ImportFromEPSG(32649)
+    transform = osr.CoordinateTransformation(vnspatref,wgsspatref)
+    
+    newfulname = inshpdir.split('.')[-2] + '_UTM.shp'
+    
+    newname = inshpdir.split('.')[-2].split('\\')[-1]
+    
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+    outdataset = driver.CreateDataSource(newfulname)
+    outLayer = outdataset.CreateLayer(newname+'_UTM',geom_type = ogr.wkbPolygon)    
+    inLayerDefn = layer.GetLayerDefn()    
+    for i in range(0, inLayerDefn.GetFieldCount()):
+        fieldDefn = inLayerDefn.GetFieldDefn(i)
+        outLayer.CreateField(fieldDefn)
+    outLayerDefn = outLayer.GetLayerDefn()    
+    for feature in layer:    
+        geom = feature.GetGeometryRef()        
+        geom.Transform(transform)    
+        outFeature = ogr.Feature(outLayerDefn)    
+        outFeature.SetGeometry(geom)        
+        for i in range(0,outLayerDefn.GetFieldCount()):            
+            outFeature.SetField(outLayerDefn.GetFieldDefn(i).GetNameRef(), feature.GetField(i))    
+        outLayer.CreateFeature(outFeature)    
+        outFeature = None          
+    wgsspatref.MorphToESRI()
+    newfulnamenoext = newfulname.split('.')[-2]
+    file = open(newfulnamenoext+'.prj', 'w') 
+    file.write(wgsspatref.ExportToWkt())
+    file.close()
+    
+####################################################    
+
 #MAIN MENU FUNCTION
 def main_menu():
     os.system('clear')
     print('WELCOME TO COORDINATE TRANSFORMATION PROGRAM! \n')
     print('PLEASE CHOOSE OPERATION YOU WANT: \n')
-    print('1. TRANSFORM VN2000 TO GEOGRAPHIC WGS84')
-    print('2. TRANSFORM VN2000 TO UTM WGS84')        
+    print('1. TRANSFORM PROJECTED VN2000 TO GEOGRAPHIC WGS84')
+    print('2. TRANSFORM PROJECTED VN2000 TO UTM WGS84')
+    print('3. TRANSFORM GEOGRAPHIC VN2000 TO GEOGRAPHIC WGS84')
+    print('4. TRANSFORM GEOGRAPHIC VN2000 TO UTM')
+        
     choice = input('>> ')
     exec_menu(choice)    
 ###################
